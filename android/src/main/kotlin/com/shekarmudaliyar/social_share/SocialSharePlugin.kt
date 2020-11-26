@@ -33,15 +33,28 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (call.method == "shareInstagram") {
-            val videoPath: String? = call.argument("filePath")
-            val share = Intent(Intent.ACTION_SEND)
-            share.setType("video/*")
-            share.setPackage("com.instagram.android")
-            val file = File(registrar.activeContext().cacheDir, videoPath)
+            val filePath: String? = call.argument("filePath")
+            val file = File(registrar.activeContext().cacheDir, filePath)
             val uri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
-            share.putExtra(Intent.EXTRA_STREAM, uri)
+
+            Log.d("SMEDIC", uri.toString())
+
+            val feedIntent = Intent(Intent.ACTION_SEND)
+            feedIntent.setType("video/*")
+            feedIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            feedIntent.setPackage(Constants.INSTAGRAM_PACKAGE_NAME)
+
+            val storiesIntent = Intent("com.instagram.share.ADD_TO_STORY")
+            storiesIntent.setDataAndType(uri, "mp4")
+            storiesIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            storiesIntent.setPackage(Constants.INSTAGRAM_PACKAGE_NAME)
+
+            activity.grantUriPermission("com.instagram.android", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            val chooserIntent = Intent.createChooser(feedIntent, "Share")
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf<Intent>(storiesIntent))
             try {
-                registrar.activity().startActivity(Intent.createChooser(share, "Share to"))
+                registrar.activity().startActivity(chooserIntent)
                 result.success("true")
             } catch (ex: ActivityNotFoundException) {
                 result.success("false")
