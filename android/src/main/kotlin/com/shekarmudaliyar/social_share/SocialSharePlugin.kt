@@ -37,7 +37,8 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
             val share = Intent(Intent.ACTION_SEND)
             share.setType("video/*")
             share.setPackage("com.instagram.android")
-            val uri = Uri.fromFile(File(videoPath))
+            val file = File(registrar.activeContext().cacheDir, videoPath)
+            val uri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
             share.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 registrar.activity().startActivity(Intent.createChooser(share, "Share to"))
