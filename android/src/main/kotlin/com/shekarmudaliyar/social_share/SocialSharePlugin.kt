@@ -49,7 +49,7 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
             storiesIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             storiesIntent.setPackage(Constants.INSTAGRAM_PACKAGE_NAME)
 
-            activity.grantUriPermission("com.instagram.android", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            registrar.activity().grantUriPermission("com.instagram.android", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
             val chooserIntent = Intent.createChooser(feedIntent, "Share")
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf<Intent>(storiesIntent))
