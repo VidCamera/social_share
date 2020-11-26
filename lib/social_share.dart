@@ -8,6 +8,12 @@ import 'package:path_provider/path_provider.dart';
 class SocialShare {
   static const MethodChannel _channel = const MethodChannel('social_share');
 
+  static Future<String> shareInstagram(String filePath) async {
+    final Map<String, dynamic> args = <String, dynamic>{"filePath": filePath};
+    final String version = await _channel.invokeMethod('shareInstagram', args);
+    return version;
+  }
+
   static Future<String> shareInstagramStory(
       String imagePath,
       String backgroundTopColor,

@@ -32,7 +32,20 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        if (call.method == "shareInstagramStory") {
+        if (call.method == "shareInstagram") {
+            val videoPath: String? = call.argument("filePath")
+            val share = Intent(Intent.ACTION_SEND)
+            share.setType("video/*")
+            share.setPackage("com.instagram.android")
+            val uri = Uri.fromFile(File(videoPath))
+            share.putExtra(Intent.EXTRA_STREAM, uri)
+            try {
+                registrar.activity().startActivity(Intent.createChooser(share, "Share to"))
+                result.success("true")
+            } catch (ex: ActivityNotFoundException) {
+                result.success("false")
+            }
+        } else if (call.method == "shareInstagramStory") {
             //share on instagram story
             val stickerImage: String? = call.argument("stickerImage")
             val backgroundImage: String? = call.argument("backgroundImage")
