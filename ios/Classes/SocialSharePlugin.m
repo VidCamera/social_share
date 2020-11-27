@@ -17,7 +17,15 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if([@"shareInstagramStory" isEqualToString:call.method]){
+    if ([@"shareInstagram" isEqualToString:call.method]) {
+        
+        //EGOR TODO
+        
+    } else if([@"shareSnapchat" isEqualToString:call.method]) {
+        
+        //EGOR TODO
+        
+    } else if([@"shareInstagramStory" isEqualToString:call.method]){
         //Sharing story on instagram
         NSString *stickerImage = call.arguments[@"stickerImage"];
         NSString *backgroundTopColor = call.arguments[@"backgroundTopColor"];
