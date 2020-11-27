@@ -5,6 +5,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import android.os.Environment
 import android.os.Build
 import android.util.Log
 import androidx.annotation.NonNull
@@ -35,26 +36,33 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
         if (call.method == "shareInstagram") {
             val filePath: String? = call.argument("filePath")
             val file = File(registrar.activeContext().cacheDir, filePath)
+            val stickerImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
+
+            val intent = Intent("com.instagram.share.ADD_TO_STORY")
+            intent.type = "video/*"
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            //intent.setData(stickerImageFile)
+            intent.putExtra("interactive_asset_uri", stickerImageFile)
+
+            val activity = registrar.activity()
+            activity.grantUriPermission("com.instagram.android", stickerImageFile, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (activity.packageManager.resolveActivity(intent, 0) != null) {
+                registrar.activeContext().startActivity(intent)
+                result.success("success")
+            } else {
+                result.success("error")
+            }
+        } else if (call.method == "shareSnapchat") {
+            val filePath: String? = call.argument("filePath")
+            val file = File(registrar.activeContext().cacheDir, filePath)
             val uri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
 
-            Log.d("SMEDIC", uri.toString())
-
-            val feedIntent = Intent(Intent.ACTION_SEND)
-            feedIntent.setType("video/*")
-            feedIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            feedIntent.setPackage(Constants.INSTAGRAM_PACKAGE_NAME)
-
-            val storiesIntent = Intent("com.instagram.share.ADD_TO_STORY")
-            storiesIntent.setDataAndType(uri, "mp4")
-            storiesIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            storiesIntent.setPackage(Constants.INSTAGRAM_PACKAGE_NAME)
-
-            registrar.activity().grantUriPermission("com.instagram.android", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-            val chooserIntent = Intent.createChooser(feedIntent, "Share")
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf<Intent>(storiesIntent))
+            val snapchatIntent = Intent(Intent.ACTION_SEND)
+            snapchatIntent.setType("video/*")
+            snapchatIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            snapchatIntent.component = ComponentName("com.snapchat.android", "com.snapchat.android.LandingPageActivity")
             try {
-                registrar.activity().startActivity(chooserIntent)
+                registrar.activity().startActivity(snapchatIntent)
                 result.success("true")
             } catch (ex: ActivityNotFoundException) {
                 result.success("false")

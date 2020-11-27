@@ -14,6 +14,12 @@ class SocialShare {
     return version;
   }
 
+  static Future<String> shareSnapchat(String filePath) async {
+    final Map<String, dynamic> args = <String, dynamic>{"filePath": filePath};
+    final String version = await _channel.invokeMethod('shareSnapchat', args);
+    return version;
+  }
+
   static Future<String> shareInstagramStory(
       String imagePath,
       String backgroundTopColor,

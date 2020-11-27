@@ -1,10 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:async';
 import 'package:screenshot/screenshot.dart';
 import 'package:social_share/social_share.dart';
 
@@ -58,15 +56,23 @@ class _MyAppState extends State<MyApp> {
                 ),
                 RaisedButton(
                   onPressed: () async {
-                    File file = await ImagePicker.pickImage(
+                    File file = await ImagePicker.pickVideo(
                         source: ImageSource.gallery);
-                    SocialShare.shareInstagramStory(file.path, "#ffffff",
-                            "#000000", "https://deep-link-url")
-                        .then((data) {
+                    SocialShare.shareSnapchat(file.path).then((data) {
                       print(data);
                     });
                   },
-                  child: Text("Share On Instagram Story"),
+                  child: Text("Share On Snapchat"),
+                ),
+                RaisedButton(
+                  onPressed: () async {
+                    File file = await ImagePicker.pickVideo(
+                        source: ImageSource.gallery);
+                    SocialShare.shareInstagram(file.path).then((data) {
+                      print(data);
+                    });
+                  },
+                  child: Text("Share On Instagram"),
                 ),
                 RaisedButton(
                   onPressed: () async {
