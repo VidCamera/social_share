@@ -36,16 +36,15 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
         if (call.method == "shareInstagram") {
             val filePath: String? = call.argument("filePath")
             val file = File(registrar.activeContext().cacheDir, filePath)
-            val stickerImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
+            val videoFileUri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
 
             val intent = Intent("com.instagram.share.ADD_TO_STORY")
             intent.type = "video/*"
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            //intent.setData(stickerImageFile)
-            intent.putExtra("interactive_asset_uri", stickerImageFile)
+            intent.putExtra("interactive_asset_uri", videoFileUri)
 
             val activity = registrar.activity()
-            activity.grantUriPermission("com.instagram.android", stickerImageFile, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            activity.grantUriPermission("com.instagram.android", videoFileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             if (activity.packageManager.resolveActivity(intent, 0) != null) {
                 registrar.activeContext().startActivity(intent)
                 result.success("success")
@@ -179,7 +178,7 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
             } catch (ex: ActivityNotFoundException) {
                 result.success("false")
             }
-        } else if (call.method == "shareFacebookMessenger") {
+        } else if (call.method == "shareFacebook") {
             val content: String? = call.argument("content")
             val fbMessangerIntent = Intent(Intent.ACTION_SEND)
             fbMessangerIntent.type = "text/plain"

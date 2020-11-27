@@ -288,7 +288,7 @@
         }
         
         result([NSNumber numberWithBool:YES]);
-    }else if([@"shareFacebookMessenger" isEqualToString:call.method]){
+    }else if([@"shareFacebook" isEqualToString:call.method]){
         NSString *content = call.arguments[@"content"];
         NSString * urlWhats = [NSString stringWithFormat:@"fb-messenger://messaging?text=%@",content];
         NSURL * fbMessangerURL = [NSURL URLWithString:[urlWhats stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];

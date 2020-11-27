@@ -89,6 +89,18 @@ class _MyAppState extends State<MyApp> {
                 ),
                 RaisedButton(
                   onPressed: () async {
+                    File file = await ImagePicker.pickVideo(
+                        source: ImageSource.gallery);
+                    SocialShare.shareInstagramStory(file.path, "#ffffff",
+                            "#000000", "https://deep-link-url")
+                        .then((data) {
+                      print(data);
+                    });
+                  },
+                  child: Text("Share On Instagram story"),
+                ),
+                RaisedButton(
+                  onPressed: () async {
                     await screenshotController.capture().then((image) async {
                       //facebook appId is mandatory for andorid or else share won't work
                       Platform.isAndroid
@@ -106,6 +118,16 @@ class _MyAppState extends State<MyApp> {
                     });
                   },
                   child: Text("Share On Facebook Story"),
+                ),
+                RaisedButton(
+                  onPressed: () async {
+                    SocialShare.shareFacebook(
+                            "This is Social Share facebook example")
+                        .then((data) {
+                      print(data);
+                    });
+                  },
+                  child: Text("Share on facebook"),
                 ),
                 RaisedButton(
                   onPressed: () async {
