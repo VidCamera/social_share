@@ -257,8 +257,7 @@ class SocialShare {
 
   static Future<String> shareFacebook(String content) async {
     final Map<String, dynamic> args = <String, dynamic>{"content": content};
-    final String version =
-        await _channel.invokeMethod('shareFacebookMessenger', args);
+    final String version = await _channel.invokeMethod('shareFacebook', args);
     return version;
   }
 

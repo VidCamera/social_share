@@ -17,10 +17,20 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"shareInstagram" isEqualToString:call.method]) {
-        
-        //EGOR TODO
-        
+    if ([@"shareInstagram" isEqualToString:call.method]) { //TODO test
+        // work but you need to save image or video first in gallery
+        NSString *u = [NSString stringWithFormat:@"instagram://library?LocalIdentifier=%@", call.arguments[@"filePath"]];
+        NSURL *instagramURL = [NSURL URLWithString:u];
+        if([[UIApplication sharedApplication] canOpenURL:instagramURL]) {
+            if (@available(iOS 10.0, *)) {
+                [[UIApplication sharedApplication] openURL:instagramURL options:@{} completionHandler:nil];
+            } else {
+                // Fallback on earlier versions
+            }
+            result(@"sharing");
+        } else {
+            result(@"not supported or no instagram installed");
+        }
     } else if([@"shareSnapchat" isEqualToString:call.method]) {
         
         //EGOR TODO
@@ -296,7 +306,7 @@
             [[UIApplication sharedApplication] openURL: fbMessangerURL];
             result(@"sharing");
         } else {
-            result(@"cannot open fb messenger");
+            result(@"cannot open fb app");
         }
         
         result([NSNumber numberWithBool:YES]);
@@ -340,12 +350,22 @@
     }
     else if([@"checkInstalledApps" isEqualToString:call.method]){
         NSMutableDictionary *installedApps = [[NSMutableDictionary alloc] init];
-        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram-stories://"]]) {
-            [installedApps setObject:[NSNumber numberWithBool: YES] forKey:@"instagram"];
-        }else{
-            [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"instagram"];
-        }
-        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"facebook-stories://"]]) {
+//        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram-stories://"]]) {
+//            [installedApps setObject:[NSNumber numberWithBool: YES] forKey:@"instagram"];
+//        }else{
+//            [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"instagram"];
+//        }
+//        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"snapchat//"]]) {
+//            [installedApps setObject:[NSNumber numberWithBool: YES] forKey:@"snapchat"];
+//        }else{
+//            [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"snapchat"];
+//        }
+        
+        //Enable upper checks when instagram and snapchat are implemented
+        [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"instagram"];
+        [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"snapchat"];
+        
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"facebook://"]]) {
             [installedApps setObject:[NSNumber numberWithBool: YES] forKey:@"facebook"];
         }else{
             [installedApps setObject:[NSNumber numberWithBool: NO] forKey:@"facebook"];

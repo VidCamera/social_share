@@ -34,37 +34,58 @@ class SocialSharePlugin(private val registrar: Registrar) : MethodCallHandler {
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (call.method == "shareInstagram") {
-            val filePath: String? = call.argument("filePath")
-            val file = File(registrar.activeContext().cacheDir, filePath)
-            val videoFileUri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
-
-            val intent = Intent("com.instagram.share.ADD_TO_STORY")
-            intent.type = "video/*"
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.putExtra("interactive_asset_uri", videoFileUri)
 
             val activity = registrar.activity()
-            activity.grantUriPermission("com.instagram.android", videoFileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            val filePath: String? = call.argument("filePath")
+            val image = File(filePath)
+            val uri: Uri = FileProvider.getUriForFile(activity, activity.getPackageName().toString() + ".com.shekarmudaliyar.social_share", image)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.setType("video/*")
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            intent.setPackage("com.instagram.android")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            val chooser = Intent.createChooser(intent, "Share to")
+            val resInfoList = activity.getPackageManager().queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+
+            for (resolveInfo in resInfoList) {
+                val packageName: String = resolveInfo.activityInfo.packageName
+                activity.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
             if (activity.packageManager.resolveActivity(intent, 0) != null) {
-                registrar.activeContext().startActivity(intent)
+                activity.startActivity(chooser)
                 result.success("success")
             } else {
                 result.success("error")
             }
-        } else if (call.method == "shareSnapchat") {
-            val filePath: String? = call.argument("filePath")
-            val file = File(registrar.activeContext().cacheDir, filePath)
-            val uri = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
 
-            val snapchatIntent = Intent(Intent.ACTION_SEND)
-            snapchatIntent.setType("video/*")
-            snapchatIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            snapchatIntent.component = ComponentName("com.snapchat.android", "com.snapchat.android.LandingPageActivity")
-            try {
-                registrar.activity().startActivity(snapchatIntent)
-                result.success("true")
-            } catch (ex: ActivityNotFoundException) {
-                result.success("false")
+        } else if (call.method == "shareSnapchat") {
+            val activity = registrar.activity()
+
+            val filePath: String? = call.argument("filePath")
+            val image = File(filePath)
+            val uri: Uri = FileProvider.getUriForFile(activity, activity.getPackageName().toString() + ".com.shekarmudaliyar.social_share", image)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.setType("video/*")
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            intent.setPackage("com.snapchat.android")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            val chooser = Intent.createChooser(intent, "Share to")
+            val resInfoList = activity.getPackageManager().queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+
+            for (resolveInfo in resInfoList) {
+                val packageName: String = resolveInfo.activityInfo.packageName
+                activity.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            if (activity.packageManager.resolveActivity(intent, 0) != null) {
+                activity.startActivity(chooser)
+                result.success("success")
+            } else {
+                result.success("error")
             }
         } else if (call.method == "shareInstagramStory") {
             //share on instagram story
